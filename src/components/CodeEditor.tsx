@@ -556,10 +556,10 @@ export function CodeEditor(): JSX.Element {
           <div className={`${tab === 'js' ? '' : 'hidden'} w-full rounded border bg-white dark:bg-gray-900 p-0 flex flex-col`}>
             <div ref={(el) => { cmContainersRef.current.js = el; }} className="min-h-[120px]" id="cm-js" />
             <div className="flex gap-2 p-2 border-t bg-gray-50 dark:bg-gray-800">
-              <button onClick={() => cmAction('undo')} className="px-2 py-1 rounded border text-sm">Undo</button>
-              <button onClick={() => cmAction('redo')} className="px-2 py-1 rounded border text-sm">Redo</button>
-              <button onClick={() => cmAction('format')} className="px-2 py-1 rounded border bg-blue-600 text-white text-sm">Format</button>
-              <button onClick={() => copyCode('js')} className="px-2 py-1 rounded border text-sm">Copy</button>
+              <button onClick={() => cmAction('undo')} className="btn">Undo</button>
+              <button onClick={() => cmAction('redo')} className="btn">Redo</button>
+              <button onClick={() => cmAction('format')} className="btn btn-primary">Format</button>
+              <button onClick={() => copyCode('js')} className="btn">Copy</button>
             </div>
           </div>
 
