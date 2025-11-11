@@ -86,10 +86,6 @@ export function CodeEditor(): JSX.Element {
     if (el) el.scrollTop = el.scrollHeight;
   }, [chatHistory]);
 
-  useEffect(() => {
-    document.body.classList.remove('dark-mode', 'light-mode');
-    document.body.classList.add(theme === 'dark' ? 'dark-mode' : 'light-mode');
-  }, [theme]);
 
   const adjustLayout = useCallback(() => {
     const header = document.querySelector('header') as HTMLElement | null;
