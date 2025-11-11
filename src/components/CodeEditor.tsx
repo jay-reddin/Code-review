@@ -365,7 +365,7 @@ export function CodeEditor(): JSX.Element {
       {/* overlay to dim left side when editor slides in on mobile */}
       <div className={`overlay transition-opacity ${overlayVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={toggleEditor} />
 
-      <aside className="left-panel w-80 min-w-[220px] bg-white/60 dark:bg-gray-900/60 border rounded-lg shadow-sm flex flex-col overflow-hidden">
+      <aside className={`left-panel w-80 min-w-[220px] bg-white/60 dark:bg-gray-900/60 border rounded-lg shadow-sm flex flex-col overflow-hidden ${loading ? 'pulse-green' : ''}`}>
         <div className="chat-header px-4 py-3 bg-white/80 dark:bg-gray-900/80 border-b flex items-center justify-between gap-2">
           <div>
             <div className="text-sm font-semibold">Chat</div>
