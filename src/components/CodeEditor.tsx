@@ -366,16 +366,19 @@ export function CodeEditor(): JSX.Element {
       <div className={`overlay transition-opacity ${overlayVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={toggleEditor} />
 
       <aside className={`left-panel w-80 min-w-[220px] bg-white/60 dark:bg-gray-900/60 border rounded-lg shadow-sm flex flex-col overflow-hidden ${loading ? 'pulse-green' : ''}`}>
-        <div className="chat-header px-4 py-3 bg-white/80 dark:bg-gray-900/80 border-b flex items-center justify-between gap-2">
-          <div>
-            <div className="text-sm font-semibold">Chat</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Generate and iterate on code</div>
-          </div>
-          <div className="flex items-center gap-2">
+        <div className="chat-header px-3 py-2 bg-white/80 dark:bg-gray-900/80 border-b flex items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
             <button title="New chat" onClick={startNewChat} className="px-2 py-1 rounded border bg-transparent text-sm hover:bg-gray-50 dark:hover:bg-gray-800">➕</button>
+            <div>
+              <div className="text-sm font-semibold">Chat</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="text-xs px-2 py-1 rounded border bg-transparent">{preferredProvider === 'puter' ? (puterSignedIn ? 'Puter' : 'Puter (signin)') : 'Pollinations'}</div>
             <select aria-label="Select model" value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="text-xs p-1 rounded border bg-transparent">
-              <option value="openai">OpenAI GPT-4o-mini</option>
-              <option value="openai-large">OpenAI GPT-4o</option>
+              <option value="openai">GPT-4o-mini</option>
+              <option value="openai-large">GPT-4o</option>
               <option value="qwen-coder">Qwen 2.5 Coder</option>
               <option value="llama">Llama 3.3 70B</option>
               <option value="mistral">Mistral</option>
