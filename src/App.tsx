@@ -1,5 +1,6 @@
 import { Header } from './components/Header';
 import { SettingsProvider } from './contexts/SettingsContext';
+import { CodeEditor } from './components/CodeEditor';
 
 function App() {
   return (
@@ -11,11 +12,7 @@ function App() {
             <h2 className="text-lg font-semibold mb-4">Editor & Preview</h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Edit HTML, CSS and JavaScript on the left. Preview updates live on the right.</p>
             <div className="mt-4">
-              {/* CodeEditor component */}
-              <script type="module">
-                // placeholder to ensure vite picks up module transforms if needed
-              </script>
-              <div id="code-editor-root"></div>
+              <CodeEditor />
             </div>
           </div>
         </main>
