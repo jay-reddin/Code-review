@@ -128,7 +128,23 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   const refreshPuterModels = useCallback(async () => {
     try {
-      const res = await fetch('https://api.puter.com/puterai/chat/models/');
+      // prefer using puter SDK if available
+      const sdk = (window as any).puter?.api;
+      if (sdk && typeof sdk.listModels === 'function') {
+        try {
+          const res = await sdk.listModels();
+          const list = Array.isArray(res) ? res.map((m: any) => (typeof m === 'string' ? m : m.name || m.id || JSON.stringify(m))) : [];
+          setPuterModels(list);
+          return list;
+        } catch (e) { /* fallback to fetch */ }
+      }
+
+      // fallback: try to fetch with Authorization token if present
+      const token = (window as any).puter?.auth?.getToken ? await (window as any).puter.auth.getToken() : null;
+      const headers: Record<string,string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch('https://api.puter.com/puterai/chat/models/', { headers, credentials: token ? 'include' : 'same-origin' });
       if (!res.ok) throw new Error('Failed to fetch puter models');
       const data = await res.json().catch(() => null);
       let list: string[] = [];
