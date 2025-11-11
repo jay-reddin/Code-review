@@ -1,3 +1,75 @@
-@tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Base font and app background colors for light/dark */
+:root {
+  --bg: #f8fafc; /* gray-50 */
+  --panel: #ffffff;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --accent: #2563eb;
+}
+:root.dark {
+  --bg: #0b1220; /* deep dark */
+  --panel: #0f1724;
+  --muted: #9ca3af;
+  --border: #1f2937;
+  --accent: #60a5fa;
+}
+
+body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background: var(--bg); }
+
+/* Minimalistic flat buttons */
+.btn { background: transparent; border: 1px solid var(--border); color: inherit; padding: 6px 10px; border-radius: 8px; cursor: pointer; }
+.btn:hover { background: rgba(0,0,0,0.03); }
+.btn-primary { background: var(--accent); color: white; border-color: transparent; }
+
+/* Panels and popups */
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
+.modal-inner { max-height: 72vh; overflow:auto; }
+
+/* Chat generating pulse */
+@keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.0); } 50% { box-shadow: 0 0 12px 4px rgba(16, 185, 129, 0.18); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.0); } }
+.pulse-green { animation: pulse-green 1.6s infinite ease-in-out; border-color: rgba(16,185,129,0.8) !important; }
+
+/* Hide native scrollbars but keep scroll functionality */
+.CodeMirror-scroll, .content, .chat, textarea, iframe { scrollbar-width: thin; }
+
+/* Ensure CodeMirror editors render below top-level modals but above page background */
+.CodeMirror, .CodeMirror-scroll, .cm-s-default, .CodeMirror-gutters, .CodeMirror-lines { z-index: 1 !important; position: relative !important; }
+
+/* Panels sit above base content but below overlays/modals */
+.left-panel, .right-panel { z-index: 2; position: relative; }
+.content, iframe { z-index: 2; position: relative; }
+
+/* Overlay used when editor toggles on mobile - must cover panels */
+.overlay { position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.22); transition: opacity .18s ease; }
+
+/* Device menu higher than editor but below settings modal */
+.device-menu { z-index: 10005; position: absolute; min-width: 160px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); border-radius: 8px; }
+
+/* Toolbar icon sizing and spacing tweaks */
+.toolbar > .flex-1 > button { padding: 8px !important; min-width: 38px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; }
+.toolbar .flex-1 { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+/* Close button */
+.settings-close-btn { border: 1px solid rgba(148,163,184,0.18); padding: 6px; border-radius: 8px; }
+
+/* Settings grid: on narrow screens, reset z-index to avoid overlay conflicts */
+@media (max-width: 991px) { .settings-grid { z-index: auto !important; } }
+
+/* Keep settings and model modals on top via portal - these classes provide fallback */
+.settings-modal { z-index: 2000001 !important; }
+.model-modal { z-index: 2000003 !important; }
+
+/* Webkit scrollbars */
+.CodeMirror-scroll::-webkit-scrollbar, .content::-webkit-scrollbar, .chat::-webkit-scrollbar, textarea::-webkit-scrollbar, iframe::-webkit-scrollbar { width: 6px; height: 6px; }
+.CodeMirror-scroll::-webkit-scrollbar-thumb, .content::-webkit-scrollbar-thumb, .chat::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, iframe::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 6px; }
+.CodeMirror-scroll::-webkit-scrollbar-track, .content::-webkit-scrollbar-track, .chat::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, iframe::-webkit-scrollbar-track { background: transparent; }
+
+/* For modern browsers, make scrollbar transparent */
+.CodeMirror-scroll, .content, .chat, textarea, iframe { scrollbar-color: rgba(0,0,0,0.12) transparent; }
+
+/* Utility tweaks */
+.chat-header, .toolbar { background: transparent; }
+.left-panel, .right-panel { border-radius: 10px; }
