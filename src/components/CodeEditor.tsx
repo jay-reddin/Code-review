@@ -252,6 +252,86 @@ export function CodeEditor(): JSX.Element {
     }
   }
 
+  // CodeMirror refs
+  const cmHtmlRef = useRef<any>(null);
+  const cmCssRef = useRef<any>(null);
+  const cmJsRef = useRef<any>(null);
+  const cmContainersRef = useRef<{ html?: HTMLDivElement | null; css?: HTMLDivElement | null; js?: HTMLDivElement | null }>({});
+
+  // Initialize CodeMirror editors once the scripts are available
+  useEffect(() => {
+    let mounted = true;
+    function initOnce() {
+      const CM = (window as any).CodeMirror;
+      if (!CM) return false;
+      // HTML editor
+      if (!cmHtmlRef.current && cmContainersRef.current.html) {
+        cmHtmlRef.current = CM(cmContainersRef.current.html, {
+          value: html,
+          mode: 'htmlmixed',
+          lineNumbers: true,
+          autoCloseBrackets: true,
+          tabSize: 2,
+        });
+        cmHtmlRef.current.on('change', (cm: any) => setHtml(cm.getValue()));
+      }
+      // CSS editor
+      if (!cmCssRef.current && cmContainersRef.current.css) {
+        cmCssRef.current = CM(cmContainersRef.current.css, {
+          value: css,
+          mode: 'css',
+          lineNumbers: true,
+          autoCloseBrackets: true,
+          tabSize: 2,
+        });
+        cmCssRef.current.on('change', (cm: any) => setCss(cm.getValue()));
+      }
+      // JS editor
+      if (!cmJsRef.current && cmContainersRef.current.js) {
+        cmJsRef.current = CM(cmContainersRef.current.js, {
+          value: js,
+          mode: 'javascript',
+          lineNumbers: true,
+          autoCloseBrackets: true,
+          tabSize: 2,
+        });
+        cmJsRef.current.on('change', (cm: any) => setJs(cm.getValue()));
+      }
+      return true;
+    }
+
+    const tryInit = () => {
+      if (!mounted) return;
+      const ok = initOnce();
+      if (!ok) setTimeout(tryInit, 300);
+    };
+
+    tryInit();
+    return () => { mounted = false; };
+  }, [html, css, js]);
+
+  function cmAction(action: 'undo' | 'redo' | 'format') {
+    const current = tab === 'html' ? cmHtmlRef.current : tab === 'css' ? cmCssRef.current : cmJsRef.current;
+    if (!current) return;
+    if (action === 'undo') return current.undo();
+    if (action === 'redo') return current.redo();
+    if (action === 'format') {
+      try {
+        const prettier = (window as any).prettier;
+        const plugins = (window as any).prettierPlugins || {};
+        const val = current.getValue();
+        let parser = 'babel';
+        let plugin: any = plugins.babel;
+        if (tab === 'html') { parser = 'html'; plugin = plugins.html; }
+        if (tab === 'css') { parser = 'css'; plugin = plugins.postcss; }
+        const formatted = prettier.format(val, { parser: parser === 'css' ? 'css' : parser, plugins: [plugin] });
+        current.setValue(formatted);
+      } catch (e) {
+        console.error('Format failed', e);
+      }
+    }
+  }
+
   useEffect(() => {
     const iframe = iframeRef.current;
     const content = document.querySelector('.content') as HTMLElement | null;
