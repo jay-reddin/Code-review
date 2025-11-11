@@ -113,8 +113,15 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       const signed = await api.isSignedIn();
       setPuterSignedIn(Boolean(signed));
       if (signed) {
-        const user = await api.getUser();
-        setPuterUser(user || null);
+        const userRaw = await api.getUser();
+        let normalized = null as UserInfo | null;
+        if (userRaw) {
+          const id = userRaw.id ?? userRaw.userId ?? userRaw.user_id ?? userRaw.uid ?? userRaw.sub ?? null;
+          const email = userRaw.email ?? userRaw.mail ?? userRaw.username?.includes('@') ? userRaw.username : null ?? null;
+          const name = userRaw.name ?? userRaw.fullName ?? userRaw.username ?? (email ? String(email).split('@')[0] : null) ?? null;
+          normalized = { id: id || undefined, email: email || undefined, name: name || undefined };
+        }
+        setPuterUser(normalized);
         await refreshPuterUsage();
       } else {
         setPuterUser(null);
