@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { dualChat } from '../services/ai';
 import { useSettings } from '../contexts/SettingsContext';
+import { Download, ExternalLink, Moon, Sun, X, Code as CodeIcon, Play } from 'lucide-react';
 
 const DEFAULT_HTML = `<!doctype html>
 <html>
@@ -20,6 +21,15 @@ const DEFAULT_CSS = `body { font-family: Inter, ui-sans-serif, system-ui, -apple
 const DEFAULT_JS = `const el = document.getElementById('app');
 el.innerHTML += ' — script loaded';
 `;
+
+function Spinner({ size = 16 }: { size?: number }) {
+  return (
+    <svg className="animate-spin" width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="4"></circle>
+      <path d="M22 12a10 10 0 00-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round"></path>
+    </svg>
+  );
+}
 
 export function CodeEditor(): JSX.Element {
   const { preferredProvider, theme, setTheme } = useSettings();
@@ -45,12 +55,8 @@ export function CodeEditor(): JSX.Element {
     const hasHtml = /<html[\s>]/i.test(html);
     if (hasHtml) {
       let doc = html;
-      if (!/<style[\s\S]*?>/.test(doc)) {
-        doc = doc.replace(/<\/head>/i, `<style>${css}</style>\n</head>`);
-      }
-      if (!/<script[\s\S]*?>/.test(doc)) {
-        doc = doc.replace(/<\/body>/i, `<script>${js}<\/script>\n</body>`);
-      }
+      if (!/<style[\s\S]*?>/.test(doc)) doc = doc.replace(/<\/head>/i, `<style>${css}</style>\n</head>`);
+      if (!/<script[\s\S]*?>/.test(doc)) doc = doc.replace(/<\/body>/i, `<script>${js}<\/script>\n</body>`);
       return doc;
     }
     return `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><style>${css}</style></head><body>${html}<script>${js}</script></body></html>`;
@@ -151,7 +157,7 @@ export function CodeEditor(): JSX.Element {
   async function generateCode() {
     if (!userInput.trim()) return;
     const input = userInput.trim();
-    setChatHistory((h) => [...h, `You: ${input}`, `AI: Loading...`]);
+    setChatHistory((h) => [...h, `You: ${escapeHtml(input)}`, `AI: Loading...`]);
     setLoading(true);
 
     const messages = [
@@ -164,7 +170,7 @@ export function CodeEditor(): JSX.Element {
       const text = res.content || '';
 
       setChatHistory((h) => h.filter((x) => x !== 'AI: Loading...'));
-      setChatHistory((h) => [...h, `AI (${res.provider}): ${text.slice(0, 200)}...`]);
+      setChatHistory((h) => [...h, `AI (${res.provider}): ${escapeHtml(text.slice(0, 300))}${text.length > 300 ? '...' : ''}`]);
 
       const htmlMatch = text.match(/```html\n([\s\S]*?)\n```/);
       const cssMatch = text.match(/```css\n([\s\S]*?)\n```/);
@@ -204,7 +210,10 @@ export function CodeEditor(): JSX.Element {
   function openInNewTab() {
     const full = combinedSrcDoc;
     const w = window.open();
-    if (!w) { alert('Please allow popups'); return; }
+    if (!w) {
+      alert('Please allow popups');
+      return;
+    }
     w.document.open();
     w.document.write(full);
     w.document.close();
@@ -216,7 +225,12 @@ export function CodeEditor(): JSX.Element {
       const blob = new Blob([combinedSrcDoc], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = 'preview.html'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      a.href = url;
+      a.download = 'preview.html';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
       return;
     }
     try {
@@ -226,7 +240,13 @@ export function CodeEditor(): JSX.Element {
       zip.file('script.js', js);
       const content = await zip.generateAsync({ type: 'blob' });
       const url = URL.createObjectURL(content);
-      const a = document.createElement('a'); a.href = url; a.download = 'vibe-coder-files.zip'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'vibe-coder-files.zip';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     } catch (e) {
       console.error(e);
     }
@@ -260,75 +280,101 @@ export function CodeEditor(): JSX.Element {
   }, [deviceSize, combinedSrcDoc]);
 
   return (
-    <div className="flex w-full">
-      <div className="overlay" style={{ display: overlayVisible ? 'block' : 'none' }} onClick={toggleEditor} />
+    <div className="flex w-full gap-4">
+      {/* overlay to dim left side when editor slides in on mobile */}
+      <div className={`overlay transition-opacity ${overlayVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={toggleEditor} />
 
-      <div className="left-panel">
-        <div className="chat-header">
-          <button onClick={startNewChat} className="px-3 py-1">➕ New Chat</button>
-          <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)}>
-            <option value="openai">OpenAI GPT-4o-mini</option>
-            <option value="openai-large">OpenAI GPT-4o</option>
-            <option value="qwen-coder">Qwen 2.5 Coder</option>
-            <option value="llama">Llama 3.3 70B</option>
-            <option value="mistral">Mistral</option>
-          </select>
-          <button className="editor-toggle px-3 py-1" onClick={toggleEditor}>🧩 Editor</button>
+      <aside className="left-panel w-80 min-w-[220px] bg-white/60 dark:bg-gray-900/60 border rounded-lg shadow-sm flex flex-col overflow-hidden">
+        <div className="chat-header px-4 py-3 bg-white/80 dark:bg-gray-900/80 border-b flex items-center justify-between gap-2">
+          <div>
+            <div className="text-sm font-semibold">Chat</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Generate and iterate on code</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button title="New chat" onClick={startNewChat} className="px-2 py-1 rounded border bg-transparent text-sm hover:bg-gray-50 dark:hover:bg-gray-800">➕</button>
+            <select aria-label="Select model" value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="text-xs p-1 rounded border bg-transparent">
+              <option value="openai">OpenAI GPT-4o-mini</option>
+              <option value="openai-large">OpenAI GPT-4o</option>
+              <option value="qwen-coder">Qwen 2.5 Coder</option>
+              <option value="llama">Llama 3.3 70B</option>
+              <option value="mistral">Mistral</option>
+            </select>
+          </div>
         </div>
 
-        <div className="chat" ref={chatRef}>
+        <div className="chat px-4 py-3 flex-1 overflow-auto" ref={chatRef}>
           {chatHistory.length === 0 ? (
             <div className="text-sm text-gray-500">No messages yet. Type a prompt below to generate code.</div>
           ) : (
-            chatHistory.map((m, i) => <div key={i} style={{ marginBottom: 12 }} dangerouslySetInnerHTML={{ __html: escapeHtml(m).replace(/\n/g, '<br>') }} />)
+            chatHistory.map((m, i) => {
+              const isUser = m.startsWith('You:');
+              return (
+                <div key={i} className={`mb-3 max-w-full ${isUser ? 'self-end text-right' : 'self-start text-left'}`}>
+                  <div className={`${isUser ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'} inline-block px-3 py-2 rounded-lg leading-relaxed`} style={{ whiteSpace: 'pre-wrap' }}>
+                    <span dangerouslySetInnerHTML={{ __html: m.replace(/^(You:|AI \([^)]*\):)\s*/, '<strong>$1</strong> ') }} />
+                  </div>
+                </div>
+              );
+            })
           )}
         </div>
 
-        <div className="chat-input">
-          <input value={userInput} onChange={(e) => setUserInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') generateCode(); }} placeholder="Type your idea..." />
-          <button onClick={generateCode} disabled={loading}>{loading ? '...' : '➡️'}</button>
+        <div className="chat-input px-4 py-3 bg-white/90 dark:bg-gray-900/90 border-t flex items-center gap-3">
+          <input aria-label="Prompt" value={userInput} onChange={(e) => setUserInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') generateCode(); }} placeholder="Describe what you want (e.g. add a navbar)" className="flex-1 px-3 py-2 rounded border bg-white dark:bg-gray-800 text-sm" />
+          <button aria-label="Generate" onClick={generateCode} disabled={loading} className="px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2">
+            {loading ? <Spinner /> : <Play size={14} />}
+            <span className="text-sm">Run</span>
+          </button>
         </div>
-      </div>
+      </aside>
 
-      <div className={`right-panel ${editorVisible ? 'visible' : ''}`}>
-        <div className="toolbar">
-          <button className="close-btn" onClick={toggleEditor}>✖ Close</button>
-          <button onClick={downloadZip}>⬇️ Download ZIP</button>
-          <button onClick={openInNewTab}>🔗 Open in New Tab</button>
-          <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>🌓 Toggle Theme</button>
-          <button onClick={() => fileInputRef.current?.click()}>⬆️ Import Files</button>
-          <input ref={fileInputRef} type="file" multiple accept=".html,.css,.js" style={{ display: 'none' }} onChange={importFiles} />
-          <select value={deviceSize} onChange={(e) => setDeviceSizeState(e.target.value as any)}>
-            <option value="full">Full Size</option>
-            <option value="iphone">iPhone (320x568)</option>
-            <option value="ipad">iPad (768x1024)</option>
-            <option value="desktop">Desktop (1280x720)</option>
-          </select>
+      <section className={`right-panel flex-1 flex flex-col bg-white/60 dark:bg-gray-900/60 border rounded-lg shadow-sm overflow-hidden ${editorVisible ? '' : 'hidden'}`}>
+        <div className="toolbar px-4 py-2 flex items-center gap-3 bg-white/80 dark:bg-gray-900/80 border-b">
+          <button title="Close editor (mobile)" onClick={toggleEditor} className="close-btn p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 hidden sm:inline-flex"><X size={16} /></button>
+
+          <div className="flex items-center gap-2">
+            <button onClick={downloadZip} title="Download ZIP" className="px-2 py-1 rounded border bg-transparent text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2"><Download size={14} />Download</button>
+            <button onClick={openInNewTab} title="Open preview in new tab" className="px-2 py-1 rounded border bg-transparent text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2"><ExternalLink size={14} />Preview</button>
+            <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} title="Toggle theme" className="px-2 py-1 rounded border bg-transparent text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2">{theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />} Theme</button>
+            <label className="px-2 py-1 rounded border bg-transparent text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 cursor-pointer">Import<input ref={fileInputRef} type="file" multiple accept=".html,.css,.js" className="hidden" onChange={importFiles} /></label>
+          </div>
+
+          <div className="ml-auto flex items-center gap-2">
+            <select aria-label="Device size" value={deviceSize} onChange={(e) => setDeviceSizeState(e.target.value as any)} className="text-sm p-1 rounded border bg-transparent">
+              <option value="full">Full Size</option>
+              <option value="iphone">iPhone (320x568)</option>
+              <option value="ipad">iPad (768x1024)</option>
+              <option value="desktop">Desktop (1280x720)</option>
+            </select>
+          </div>
         </div>
 
-        <div className="tabs">
-          <div className={`tab ${tab === 'html' ? 'active' : ''}`} onClick={() => switchTab('html')}>HTML</div>
-          <div className={`tab ${tab === 'css' ? 'active' : ''}`} onClick={() => switchTab('css')}>CSS</div>
-          <div className={`tab ${tab === 'js' ? 'active' : ''}`} onClick={() => switchTab('js')}>JS</div>
-          <div className={`tab ${tab === 'output' ? 'active' : ''}`} onClick={() => switchTab('output')}>Output</div>
+        <div className="tabs flex bg-transparent border-b">
+          <button onClick={() => switchTab('html')} className={`tab px-3 py-2 text-sm flex-1 ${tab === 'html' ? 'bg-white dark:bg-gray-900 font-medium' : 'bg-transparent'}`}><CodeIcon size={14} className="inline-block mr-2" />HTML</button>
+          <button onClick={() => switchTab('css')} className={`tab px-3 py-2 text-sm flex-1 ${tab === 'css' ? 'bg-white dark:bg-gray-900 font-medium' : 'bg-transparent'}`}>CSS</button>
+          <button onClick={() => switchTab('js')} className={`tab px-3 py-2 text-sm flex-1 ${tab === 'js' ? 'bg-white dark:bg-gray-900 font-medium' : 'bg-transparent'}`}>JS</button>
+          <button onClick={() => switchTab('output')} className={`tab px-3 py-2 text-sm flex-1 ${tab === 'output' ? 'bg-white dark:bg-gray-900 font-medium' : 'bg-transparent'}`}>Output</button>
         </div>
 
-        <div className="content">
-          <textarea className={tab === 'html' ? '' : 'hidden'} value={html} onChange={(e) => setHtml(e.target.value)} />
-          <textarea className={tab === 'css' ? '' : 'hidden'} value={css} onChange={(e) => setCss(e.target.value)} />
-          <textarea className={tab === 'js' ? '' : 'hidden'} value={js} onChange={(e) => setJs(e.target.value)} />
-          <iframe id="preview" ref={iframeRef} className={tab === 'output' ? '' : 'hidden'} sandbox="allow-scripts allow-forms allow-same-origin" />
+        <div className="content flex-1 p-4 overflow-auto bg-white dark:bg-gray-900">
+          <textarea aria-label="HTML editor" className={`${tab === 'html' ? '' : 'hidden'} w-full h-[420px] rounded border p-3 font-mono text-sm bg-white dark:bg-gray-900`} value={html} onChange={(e) => setHtml(e.target.value)} />
+          <textarea aria-label="CSS editor" className={`${tab === 'css' ? '' : 'hidden'} w-full h-[420px] rounded border p-3 font-mono text-sm bg-white dark:bg-gray-900`} value={css} onChange={(e) => setCss(e.target.value)} />
+          <textarea aria-label="JS editor" className={`${tab === 'js' ? '' : 'hidden'} w-full h-[420px] rounded border p-3 font-mono text-sm bg-white dark:bg-gray-900`} value={js} onChange={(e) => setJs(e.target.value)} />
+
+          <div className={`${tab === 'output' ? '' : 'hidden'} w-full h-[520px] rounded border overflow-hidden`}>
+            <iframe title="preview" ref={iframeRef} className="w-full h-full" sandbox="allow-scripts allow-forms allow-same-origin" />
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
 
 function escapeHtml(unsafe: string) {
   return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
