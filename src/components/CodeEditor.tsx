@@ -506,7 +506,7 @@ export function CodeEditor(): JSX.Element {
           <div className="flex-1 flex items-center justify-center gap-3">
             <button onClick={downloadZip} title="Download ZIP" className="btn"><Download size={16} /></button>
             <button onClick={openInNewTab} title="Open preview in new tab" className="btn"><ExternalLink size={16} /></button>
-            <button title="Import files" onClick={() => fileInputRef.current?.click()} className="p-2 rounded border bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center"><UploadIcon /></button>
+            <button title="Import files" onClick={() => fileInputRef.current?.click()} className="btn"><UploadIcon /></button>
             <input ref={fileInputRef} type="file" multiple accept=".html,.css,.js" className="hidden" onChange={importFiles} />
           </div>
 
