@@ -47,7 +47,7 @@ export function SettingsPopup({ onClose }: { onClose: () => void }) {
             </button>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 p-4 settings-grid">
+          <div className="grid md:grid-cols-2 gap-6 p-4 settings-grid max-h-[70vh] overflow-auto">
             <section>
               <h3 className="font-medium mb-2">Account</h3>
               {puterSignedIn ? (
