@@ -403,11 +403,11 @@ export function CodeEditor(): JSX.Element {
   }, [deviceSize, combinedSrcDoc]);
 
   return (
-    <div className="flex w-full gap-4">
+    <div className="flex w-full gap-4 flex-nowrap items-start">
       {/* overlay to dim left side when editor slides in on mobile */}
       <div className={`overlay transition-opacity ${overlayVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={toggleEditor} />
 
-      <aside className={`left-panel w-80 min-w-[220px] bg-white/60 dark:bg-gray-900/60 border rounded-lg shadow-sm flex flex-col overflow-hidden ${loading ? 'pulse-green' : ''}`}>
+      <aside className={`left-panel w-80 min-w-[220px] flex-shrink-0 bg-white/60 dark:bg-gray-900/60 border rounded-lg shadow-sm flex flex-col overflow-hidden ${loading ? 'pulse-green' : ''}`}>
         <div className="chat-header px-3 py-2 bg-white/80 dark:bg-gray-900/80 border-b flex items-center justify-between gap-2">
           <div className="flex items-center gap-3">
             <button title="New chat" onClick={startNewChat} className="px-2 py-1 rounded border bg-transparent text-sm hover:bg-gray-50 dark:hover:bg-gray-800">➕</button>
