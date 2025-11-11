@@ -159,6 +159,30 @@ export function SettingsPopup({ onClose }: { onClose: () => void }) {
           </section>
         </div>
       </div>
+
+      {showModels && (
+        <div className="fixed inset-0 z-70">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowModels(null)} />
+          <div className="absolute inset-x-6 top-20 mx-auto max-w-3xl rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-xl border border-gray-200 dark:border-gray-800 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base font-semibold">{showModels === 'pollinations' ? 'Pollinations Models' : 'Puter Models'}</h3>
+              <div className="flex items-center gap-2">
+                <input value={modelSearch} onChange={(e) => setModelSearch(e.target.value)} placeholder="Search models" className="px-2 py-1 rounded border text-sm" />
+                <button onClick={() => setShowModels(null)} className="px-2 py-1 rounded border">Close</button>
+              </div>
+            </div>
+            <div className="max-h-[60vh] overflow-auto p-2 space-y-2">
+              {(showModels === 'pollinations' ? pollinationsModels : puterModels).filter(m => m.toLowerCase().includes(modelSearch.toLowerCase())).map((m) => (
+                <div key={m} className="flex items-center justify-between border-b py-2">
+                  <div className="text-sm">{m}</div>
+                  <input type="checkbox" checked={!!activeModels[m]} onChange={(e) => { const next = { ...activeModels, [m]: e.target.checked }; setActiveModels(next); localStorage.setItem('active.models', JSON.stringify(next)); }} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
