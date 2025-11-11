@@ -20,19 +20,37 @@
 }
 
 /* Ensure editors sit below modals */
-.CodeMirror, .CodeMirror-scroll, .cm-s-default {
-  z-index: 10 !important;
-  position: relative;
+.CodeMirror, .CodeMirror-scroll, .cm-s-default, .CodeMirror-gutters, .CodeMirror-lines {
+  z-index: 0 !important;
+  position: relative !important;
 }
 
-.right-panel, .left-panel {
-  z-index: 10;
+/* Panels should sit below modals */
+.right-panel, .left-panel, .overlay, .content, iframe {
+  z-index: 0 !important;
   position: relative;
 }
 
 /* Device menu higher than editor but below settings modal */
 .device-menu {
-  z-index: 60;
+  z-index: 10005;
+  position: absolute;
+}
+
+/* Toolbar icon sizing and spacing tweaks */
+.toolbar > .flex-1 > button {
+  padding: 8px !important;
+  min-width: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* X close button border */
+.settings-close-btn {
+  border: 1px solid rgba(148,163,184,0.18);
+  padding: 6px;
+  border-radius: 6px;
 }
 
 /* Webkit */
