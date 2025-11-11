@@ -454,8 +454,8 @@ export function CodeEditor(): JSX.Element {
         </div>
       </aside>
 
-      <section className={`right-panel flex-1 min-w-0 flex flex-col bg-white/60 dark:bg-gray-900/60 border rounded-lg shadow-sm overflow-hidden ${editorVisible ? '' : 'hidden'}`}>
-        <div className="toolbar px-4 py-2 flex items-center bg-white/80 dark:bg-gray-900/80 border-b">
+      <section className={`right-panel flex-1 min-w-0 flex flex-col bg-white/60 dark:bg-gray-900/60 border rounded-lg shadow-sm overflow-visible ${editorVisible ? '' : 'hidden'}`}>
+        <div className="toolbar px-4 py-2 flex items-center bg-white/80 dark:bg-gray-900/80 border-b relative z-10 overflow-visible">
           <button title="Close editor (mobile)" onClick={toggleEditor} className="close-btn p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 hidden sm:inline-flex"><X size={16} /></button>
 
           <div className="flex-1 flex items-center justify-center gap-3">
@@ -470,7 +470,7 @@ export function CodeEditor(): JSX.Element {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="1.2"/><rect x="7" y="16" width="10" height="4" rx="1" stroke="currentColor" strokeWidth="1.2"/></svg>
             </button>
             {deviceMenuOpen && (
-              <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-800 border rounded shadow device-menu" style={{ top: '100%' }}>
+              <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-800 border rounded shadow device-menu" style={{ top: 'calc(100% + 6px)' }}>
                 <button onClick={() => { setDeviceSizeState('full'); setDeviceMenuOpen(false); }} className="w-full text-left px-3 py-2 text-sm">Full Size</button>
                 <button onClick={() => { setDeviceSizeState('iphone'); setDeviceMenuOpen(false); }} className="w-full text-left px-3 py-2 text-sm">iPhone (320x568)</button>
                 <button onClick={() => { setDeviceSizeState('ipad'); setDeviceMenuOpen(false); }} className="w-full text-left px-3 py-2 text-sm">iPad (768x1024)</button>
@@ -488,8 +488,8 @@ export function CodeEditor(): JSX.Element {
         </div>
 
         <div className="content flex-1 p-4 overflow-auto bg-white dark:bg-gray-900">
-          <div className={`${tab === 'html' ? '' : 'hidden'} w-full h-[420px] rounded border bg-white dark:bg-gray-900 p-0`}>
-            <div ref={(el) => { cmContainersRef.current.html = el; }} className="h-full" id="cm-html" />
+          <div className={`${tab === 'html' ? '' : 'hidden'} w-full rounded border bg-white dark:bg-gray-900 p-0 flex flex-col`}>
+            <div ref={(el) => { cmContainersRef.current.html = el; }} className="min-h-[120px]" id="cm-html" />
             <div className="flex gap-2 p-2 border-t bg-gray-50 dark:bg-gray-800">
               <button onClick={() => cmAction('undo')} className="px-2 py-1 rounded border text-sm">Undo</button>
               <button onClick={() => cmAction('redo')} className="px-2 py-1 rounded border text-sm">Redo</button>
@@ -498,8 +498,8 @@ export function CodeEditor(): JSX.Element {
             </div>
           </div>
 
-          <div className={`${tab === 'css' ? '' : 'hidden'} w-full h-[420px] rounded border bg-white dark:bg-gray-900 p-0`}>
-            <div ref={(el) => { cmContainersRef.current.css = el; }} className="h-full" id="cm-css" />
+          <div className={`${tab === 'css' ? '' : 'hidden'} w-full rounded border bg-white dark:bg-gray-900 p-0 flex flex-col`}>
+            <div ref={(el) => { cmContainersRef.current.css = el; }} className="min-h-[120px]" id="cm-css" />
             <div className="flex gap-2 p-2 border-t bg-gray-50 dark:bg-gray-800">
               <button onClick={() => cmAction('undo')} className="px-2 py-1 rounded border text-sm">Undo</button>
               <button onClick={() => cmAction('redo')} className="px-2 py-1 rounded border text-sm">Redo</button>
@@ -508,8 +508,8 @@ export function CodeEditor(): JSX.Element {
             </div>
           </div>
 
-          <div className={`${tab === 'js' ? '' : 'hidden'} w-full h-[420px] rounded border bg-white dark:bg-gray-900 p-0`}>
-            <div ref={(el) => { cmContainersRef.current.js = el; }} className="h-full" id="cm-js" />
+          <div className={`${tab === 'js' ? '' : 'hidden'} w-full rounded border bg-white dark:bg-gray-900 p-0 flex flex-col`}>
+            <div ref={(el) => { cmContainersRef.current.js = el; }} className="min-h-[120px]" id="cm-js" />
             <div className="flex gap-2 p-2 border-t bg-gray-50 dark:bg-gray-800">
               <button onClick={() => cmAction('undo')} className="px-2 py-1 rounded border text-sm">Undo</button>
               <button onClick={() => cmAction('redo')} className="px-2 py-1 rounded border text-sm">Redo</button>
@@ -518,8 +518,8 @@ export function CodeEditor(): JSX.Element {
             </div>
           </div>
 
-          <div className={`${tab === 'output' ? '' : 'hidden'} w-full h-[520px] rounded border overflow-hidden`}>
-            <iframe title="preview" ref={iframeRef} className="w-full h-full" sandbox="allow-scripts allow-forms allow-same-origin" />
+          <div className={`${tab === 'output' ? '' : 'hidden'} w-full rounded border overflow-hidden flex-1 min-h-[200px]`}>
+            <iframe title="preview" ref={iframeRef} className="w-full h-full flex-1" sandbox="allow-scripts allow-forms allow-same-origin" />
           </div>
         </div>
       </section>
