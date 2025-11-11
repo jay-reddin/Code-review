@@ -161,9 +161,9 @@ export function SettingsPopup({ onClose }: { onClose: () => void }) {
       </div>
 
       {showModels && (
-        <div className="fixed inset-0" style={{ zIndex: 100001 }}>
+        <div className="fixed inset-0" style={{ zIndex: 150000 }}>
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowModels(null)} />
-          <div className="absolute inset-x-6 top-20 mx-auto max-w-3xl rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-xl border border-gray-200 dark:border-gray-800 p-4" style={{ zIndex: 100002 }}>
+          <div className="absolute inset-x-6 top-20 mx-auto max-w-3xl rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-xl border border-gray-200 dark:border-gray-800 p-4" style={{ zIndex: 150001 }}>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base font-semibold">{showModels === 'pollinations' ? 'Pollinations Models' : 'Puter Models'}</h3>
               <div className="flex items-center gap-2">
