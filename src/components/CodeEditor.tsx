@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { dualChat } from '../services/ai';
 import { useSettings } from '../contexts/SettingsContext';
-import { Download, ExternalLink, Moon, Sun, X, Code as CodeIcon, Play } from 'lucide-react';
+import { Download, ExternalLink, X, Code as CodeIcon, Play } from 'lucide-react';
+function UploadIcon() { return (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>);}
 
 const DEFAULT_HTML = `<!doctype html>
 <html>
