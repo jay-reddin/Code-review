@@ -70,15 +70,14 @@ export function SettingsPopup({ onClose }: { onClose: () => void }) {
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between">
                 <label htmlFor="theme">Theme</label>
-                <select
-                  id="theme"
-                  value={theme}
-                  onChange={(e) => setTheme(e.target.value as any)}
-                  className="rounded-md border border-gray-200 dark:border-gray-700 bg-transparent px-2 py-1"
-                >
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
-                </select>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                    className="rounded-md border border-gray-200 dark:border-gray-700 bg-transparent px-2 py-1 text-sm"
+                  >
+                    Toggle Theme
+                  </button>
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <label htmlFor="device">Default device size</label>
