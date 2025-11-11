@@ -19,6 +19,22 @@
   scrollbar-width: thin;
 }
 
+/* Ensure editors sit below modals */
+.CodeMirror, .CodeMirror-scroll, .cm-s-default {
+  z-index: 10 !important;
+  position: relative;
+}
+
+.right-panel, .left-panel {
+  z-index: 10;
+  position: relative;
+}
+
+/* Device menu higher than editor but below settings modal */
+.device-menu {
+  z-index: 60;
+}
+
 /* Webkit */
 .CodeMirror-scroll::-webkit-scrollbar, .content::-webkit-scrollbar, .chat::-webkit-scrollbar, textarea::-webkit-scrollbar, iframe::-webkit-scrollbar {
   width: 6px;
