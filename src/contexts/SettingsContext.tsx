@@ -57,12 +57,57 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     else root.classList.remove('dark');
   }, [theme]);
 
+  const refreshPuterUsage = useCallback(async () => {
+    try {
+      const api = window.puter?.auth;
+      if (!api) {
+        setPuterUsage(null);
+        return;
+      }
+      // try getMonthlyUsage then fallback to detailed
+      let usage: PutterUsage | null = null;
+      try {
+        const mu = await api.getMonthlyUsage?.();
+        if (mu) {
+          // flexible parsing
+          const used = typeof mu.used === 'number' ? mu.used : (typeof mu.consumed === 'number' ? mu.consumed : null);
+          const limit = typeof mu.limit === 'number' ? mu.limit : (typeof mu.quota === 'number' ? mu.quota : null);
+          if (used !== null) usage = { used, limit };
+        }
+      } catch (e) {
+        // ignore
+        usage = null;
+      }
+
+      // if still null, attempt detailed app usage
+      if (!usage && api.getDetailedAppUsage) {
+        try {
+          const d = await api.getDetailedAppUsage();
+          // try to compute sum
+          if (d && Array.isArray(d.items)) {
+            const totalUsed = d.items.reduce((s: number, it: any) => s + (Number(it.usage || it.used || 0) || 0), 0);
+            // if there is quota info
+            const limit = typeof d.limit === 'number' ? d.limit : null;
+            usage = { used: totalUsed, limit };
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      setPuterUsage(usage);
+    } catch {
+      setPuterUsage(null);
+    }
+  }, []);
+
   const refreshPuterAuth = useCallback(async () => {
     try {
       const api = window.puter?.auth;
       if (!api) {
         setPuterSignedIn(false);
         setPuterUser(null);
+        setPuterUsage(null);
         return;
       }
       const signed = await api.isSignedIn();
@@ -70,26 +115,39 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       if (signed) {
         const user = await api.getUser();
         setPuterUser(user || null);
+        await refreshPuterUsage();
       } else {
         setPuterUser(null);
+        setPuterUsage(null);
       }
     } catch {
       setPuterSignedIn(false);
       setPuterUser(null);
+      setPuterUsage(null);
     }
-  }, []);
+  }, [refreshPuterUsage]);
 
   const signInPuter = useCallback(async () => {
     const api = window.puter?.auth;
-    if (!api) return;
-    await api.signIn();
-    await refreshPuterAuth();
+    if (!api) return false;
+    try {
+      await api.signIn();
+      await refreshPuterAuth();
+      return true;
+    } catch (e) {
+      console.error('Puter signIn failed', e);
+      return false;
+    }
   }, [refreshPuterAuth]);
 
   const signOutPuter = useCallback(async () => {
     const api = window.puter?.auth;
     if (!api) return;
-    await api.signOut();
+    try {
+      await api.signOut();
+    } catch (e) {
+      console.error('Puter signOut failed', e);
+    }
     await refreshPuterAuth();
   }, [refreshPuterAuth]);
 
