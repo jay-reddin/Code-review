@@ -207,9 +207,24 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     })();
     // Also refresh after a small delay to catch deferred script load
     const t = setTimeout(() => refreshPuterAuth(), 1500);
+
+    // If puter exposes auth events, subscribe to keep state in sync
+    const api = (window as any).puter?.auth;
+    let unsub: (() => void) | null = null;
+    try {
+      if (api && typeof api.onAuthChange === 'function') {
+        const cb = () => refreshPuterAuth();
+        api.onAuthChange(cb);
+        unsub = () => api.offAuthChange && api.offAuthChange(cb);
+      }
+    } catch (e) {
+      // ignore
+    }
+
     return () => {
       mounted = false;
       clearTimeout(t);
+      if (unsub) unsub();
     };
   }, [refreshPuterAuth]);
 
