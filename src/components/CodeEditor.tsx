@@ -357,9 +357,32 @@ export function CodeEditor(): JSX.Element {
         </div>
 
         <div className="content flex-1 p-4 overflow-auto bg-white dark:bg-gray-900">
-          <textarea aria-label="HTML editor" className={`${tab === 'html' ? '' : 'hidden'} w-full h-[420px] rounded border p-3 font-mono text-sm bg-white dark:bg-gray-900`} value={html} onChange={(e) => setHtml(e.target.value)} />
-          <textarea aria-label="CSS editor" className={`${tab === 'css' ? '' : 'hidden'} w-full h-[420px] rounded border p-3 font-mono text-sm bg-white dark:bg-gray-900`} value={css} onChange={(e) => setCss(e.target.value)} />
-          <textarea aria-label="JS editor" className={`${tab === 'js' ? '' : 'hidden'} w-full h-[420px] rounded border p-3 font-mono text-sm bg-white dark:bg-gray-900`} value={js} onChange={(e) => setJs(e.target.value)} />
+          <div className={`${tab === 'html' ? '' : 'hidden'} w-full h-[420px] rounded border bg-white dark:bg-gray-900 p-0`}>
+            <div ref={(el) => { if (el && ! (el as any).__cm_init) { (el as any).__cm_container = el; } }} className="h-full" id="cm-html" />
+            <div className="flex gap-2 p-2 border-t bg-gray-50 dark:bg-gray-800">
+              <button onClick={() => cmAction('undo')} className="px-2 py-1 rounded border text-sm">Undo</button>
+              <button onClick={() => cmAction('redo')} className="px-2 py-1 rounded border text-sm">Redo</button>
+              <button onClick={() => cmAction('format')} className="px-2 py-1 rounded border bg-blue-600 text-white text-sm">Format</button>
+            </div>
+          </div>
+
+          <div className={`${tab === 'css' ? '' : 'hidden'} w-full h-[420px] rounded border bg-white dark:bg-gray-900 p-0`}>
+            <div ref={(el) => { if (el && ! (el as any).__cm_init) { (el as any).__cm_container = el; } }} className="h-full" id="cm-css" />
+            <div className="flex gap-2 p-2 border-t bg-gray-50 dark:bg-gray-800">
+              <button onClick={() => cmAction('undo')} className="px-2 py-1 rounded border text-sm">Undo</button>
+              <button onClick={() => cmAction('redo')} className="px-2 py-1 rounded border text-sm">Redo</button>
+              <button onClick={() => cmAction('format')} className="px-2 py-1 rounded border bg-blue-600 text-white text-sm">Format</button>
+            </div>
+          </div>
+
+          <div className={`${tab === 'js' ? '' : 'hidden'} w-full h-[420px] rounded border bg-white dark:bg-gray-900 p-0`}>
+            <div ref={(el) => { if (el && ! (el as any).__cm_init) { (el as any).__cm_container = el; } }} className="h-full" id="cm-js" />
+            <div className="flex gap-2 p-2 border-t bg-gray-50 dark:bg-gray-800">
+              <button onClick={() => cmAction('undo')} className="px-2 py-1 rounded border text-sm">Undo</button>
+              <button onClick={() => cmAction('redo')} className="px-2 py-1 rounded border text-sm">Redo</button>
+              <button onClick={() => cmAction('format')} className="px-2 py-1 rounded border bg-blue-600 text-white text-sm">Format</button>
+            </div>
+          </div>
 
           <div className={`${tab === 'output' ? '' : 'hidden'} w-full h-[520px] rounded border overflow-hidden`}>
             <iframe title="preview" ref={iframeRef} className="w-full h-full" sandbox="allow-scripts allow-forms allow-same-origin" />
