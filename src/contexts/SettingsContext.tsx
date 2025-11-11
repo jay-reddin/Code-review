@@ -29,6 +29,12 @@ interface SettingsState {
   refreshPuterUsage: () => Promise<void>;
   signInPuter: () => Promise<boolean>;
   signOutPuter: () => Promise<void>;
+  pollinationsModels: string[];
+  puterModels: string[];
+  refreshPollinationsModels: () => Promise<string[]>;
+  refreshPuterModels: () => Promise<string[]>;
+  activeModels: Record<string, boolean>;
+  setActiveModels: (m: Record<string, boolean>) => void;
 }
 
 const SettingsContext = createContext<SettingsState | null>(null);
