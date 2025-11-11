@@ -39,7 +39,7 @@ export function SettingsPopup({ onClose }: { onClose: () => void }) {
       <div className="absolute inset-x-4 top-10 mx-auto max-w-2xl rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-xl border border-gray-200 dark:border-gray-800 settings-modal" style={{ zIndex: 1000001 }}>
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800">
           <h2 className="text-base font-semibold">Settings</h2>
-          <button aria-label="Close" onClick={onClose} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
+          <button aria-label="Close" onClick={onClose} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 settings-close-btn">
             <X className="h-5 w-5" />
           </button>
         </div>
