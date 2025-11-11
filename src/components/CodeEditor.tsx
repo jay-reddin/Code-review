@@ -391,7 +391,25 @@ export function CodeEditor(): JSX.Element {
     }
   }
 
+  // Keep CodeMirror editors in sync when state changes externally (e.g. AI inserts code)
   useEffect(() => {
+    try {
+      if (cmHtmlRef.current && typeof cmHtmlRef.current.getValue === 'function') {
+        if (cmHtmlRef.current.getValue() !== html) cmHtmlRef.current.setValue(html);
+        setTimeout(() => { if (cmHtmlRef.current.refresh) cmHtmlRef.current.refresh(); }, 40);
+      }
+      if (cmCssRef.current && typeof cmCssRef.current.getValue === 'function') {
+        if (cmCssRef.current.getValue() !== css) cmCssRef.current.setValue(css);
+        setTimeout(() => { if (cmCssRef.current.refresh) cmCssRef.current.refresh(); }, 40);
+      }
+      if (cmJsRef.current && typeof cmJsRef.current.getValue === 'function') {
+        if (cmJsRef.current.getValue() !== js) cmJsRef.current.setValue(js);
+        setTimeout(() => { if (cmJsRef.current.refresh) cmJsRef.current.refresh(); }, 40);
+      }
+    } catch (e) {
+      // ignore
+    }
+
     const iframe = iframeRef.current;
     const content = document.querySelector('.content') as HTMLElement | null;
     if (!iframe || !content) return;
