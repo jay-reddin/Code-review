@@ -444,7 +444,7 @@ export function CodeEditor(): JSX.Element {
       <aside className={`left-panel w-80 min-w-[220px] flex-shrink-0 bg-white/60 dark:bg-gray-900/60 border rounded-lg shadow-sm flex flex-col overflow-hidden ${loading ? 'pulse-green' : ''}`}>
         <div className="chat-header px-3 py-2 bg-white/80 dark:bg-gray-900/80 border-b flex items-center justify-between gap-2">
           <div className="flex items-center gap-3">
-            <button title="New chat" onClick={startNewChat} className="px-2 py-1 rounded border bg-transparent text-sm hover:bg-gray-50 dark:hover:bg-gray-800">➕</button>
+            <button title="New chat" onClick={startNewChat} className="btn">➕</button>
             <div>
               <div className="text-sm font-semibold">Chat</div>
             </div>
